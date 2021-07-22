@@ -1,15 +1,18 @@
+//grabs from html
 const question = document.querySelector('#question');
 const choices = Array.from(document.querySelectorAll('.choice-text'));
 const progressText = document.querySelector('#progressText');
-const scoreTest = document.querySelector('#score');
+const scoreText = document.querySelector('#score');
 const progressBarFull = document.querySelector('#progressBarFull');
+const timerEl = document.querySelector('.timer-text')
 
+// all vars to be used and things pushed into 
 let currentQuestion = {};
 let acceptingAnswers = true;
 let score = 0;
 let questionCounter = 0;
 let availableQuestions = []; 
-
+// questions
 let questions = [
     {
         question: 'What does HTML stand for?',
@@ -54,14 +57,29 @@ let questions = [
     
 ]
 //meant to be changed
-const SCORE_POINTS = 100;
+const SCORE_POINTS = 15;
 const MAX_QUESTIONS = 5; 
+var timeLeft = 100;
+
+//timer function 
+function countDown() {
+    var timeInterval = setInterval(function () {
+      timeLeft--;
+      timerEl.textContent = timeLeft; 
+      if(timeLeft === 0) { 
+        clearInterval(timeInterval);
+      } 
+  
+    }, 1000); 
+  
+    };
 //start game
 startGame = () => {
     questionCounter = 0;
     score = 0;
     availableQuestions = [...questions]
     getNewQuestion();
+    countDown(); 
 }
 // which question to ask
 getNewQuestion = () => {
@@ -70,15 +88,15 @@ getNewQuestion = () => {
 
         return window.location.assign('./end.html')
     }
-
+//adds to question counter and pushes to dom 
     questionCounter ++; 
     progressText.innerText = `Question ${questionCounter} of ${MAX_QUESTIONS}`
     progressBarFull.style.width=`${(questionCounter/MAX_QUESTIONS) * 100}%`
-
+//randomizes number
     const questionsIndex = Math.floor(Math.random() * availableQuestions.length);
     currentQuestion = availableQuestions[questionsIndex] 
     question.innerText = currentQuestion.question
-
+//choses the dataset number and choude
 choices.forEach(choice => {
     const number = choice.dataset['number']
     choice.innerText = currentQuestion['choice' + number]
@@ -100,8 +118,13 @@ choices.forEach(choice => {
         //increase points
         if(classToApply == 'correct') {
             incrementScore(SCORE_POINTS)
-        } 
-        //put timer thingy in here to if == incorret)
+        }
+        // to make the time go down.  
+        else {
+            timeLeft -= 5;
+        }
+      
+
         selectedChoice.parentElement.classList.add(classToApply) 
         setTimeout(() => {
             selectedChoice.parentElement.classList.remove(classToApply)
